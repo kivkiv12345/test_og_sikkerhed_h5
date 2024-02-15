@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import os
 import string
+from pathlib import Path
 
 LETTER_MIN: int = ord('A')
 LETTER_MAX: int = ord('Z')
@@ -89,4 +91,3 @@ if __name__ == '__main__':
         encrypted = crypt(shift, instr, strip_invalid=True)
         print(encrypted)
         print(crypt(-shift, encrypted, strip_invalid=True))
-
