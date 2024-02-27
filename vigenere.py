@@ -12,14 +12,15 @@ def crypt(message: str, key: str, reverse=False) -> str:
 
     out: str = ''
 
-    for key_counter, letter in enumerate(message):
-
-        # Skip invalid characters in the key
-        while (keyletter := key[key_counter % len(key)].upper()) not in string.ascii_uppercase:
-            key_counter += 1
+    # We can't increment key_counter with enumerate(),
+    # because it doesn't account for -= 1 on invalid characters.
+    key_counter: int = -1
+    for letter in message:
+        key_counter += 1
 
         if letter not in string.ascii_letters:
             out += letter  # Don't change invalid letters
+            key_counter -= 1
             continue
         elif letter in string.ascii_uppercase:
             alphabet = string.ascii_uppercase
@@ -28,10 +29,15 @@ def crypt(message: str, key: str, reverse=False) -> str:
         else:
             assert False, 'Letter not in any known alphabet'
 
+        # Skip invalid characters in the key
+        while (keyletter := key[key_counter % len(key)].upper()) not in string.ascii_uppercase:
+            key_counter += 1
+
         # Letter is in either .ascii_uppercase or .ascii_lowercase
 
-        # TODO Kevin: Should A shift by 1 or 0 ?
-        shift = (ord(keyletter) - LETTER_START) % ALPHABET_LENGTH
+        # Official Vigenere cipher shifts by +0,
+        # but I prefer shifting by +1.
+        shift = (ord(keyletter) - LETTER_START + 0) % ALPHABET_LENGTH
 
         if reverse:
             shift = -shift
@@ -51,8 +57,9 @@ def crypt(message: str, key: str, reverse=False) -> str:
 
 
 if __name__ == '__main__':
-    key = "Mystery box"
-    encoded = crypt("hvad er det egentlig det er ", key)
+    key = "pera"
+    # encoded = crypt("XWIGI EGI XLS XNTTW SU TRRVNTIMDR SCI XWEI LMAP TGIKICX CDYG HMHXTV JGSB GIPHXRV NSJV HXEGC ECH SCI XWEI LMAP TGIKICX CDYG VSKIGRBICX XWMH XW E ZTVN XQESGXPRI AIHWDR XD GIBIQIG TWEIRMPPAC JDV EIXPGZW YHMCK JGIFYTRRC ECEACHMH LLXGW GIFYXVT ASCKTV TPWHEVI SU IIMX MC DVSIG IS ERLXIKI FTXIIG GIHYAXH", key)
+    encoded = crypt("hello hello", key)
     print(encoded)
     decoded = crypt(encoded, key, reverse=True)
     print(decoded)
