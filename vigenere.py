@@ -1,4 +1,5 @@
 import string
+from typing import Sequence
 
 LETTER_START: int = ord(string.ascii_uppercase[0])  # A
 LETTER_STOP: int = ord(string.ascii_uppercase[-1])  # Z
@@ -56,10 +57,46 @@ def crypt(message: str, key: str, reverse=False) -> str:
     return out
 
 
+def decrypt_key_length(message: str) -> int:
+    # TODO Kevin: Doesn't work yet
+
+    shift_coincidences: list[int] = []
+    for shift in range(2, len(message)):  # for shifted_message
+        coincidences: int = 0
+        for shifted_index in range(len(message) - shift):  # for char in shifted_message
+            original_index = shifted_index + shift
+            if message[shifted_index] == message[original_index]:
+                coincidences += 1
+        shift_coincidences.append(coincidences)
+
+    coincidence_score: list[float] = []
+    for step_size in range(2, len(shift_coincidences)):
+        coincidence_sumlist: list[int] = []
+        for coincidence_index in range(0, len(shift_coincidences), step_size):
+            coincidence_cnt = shift_coincidences[coincidence_index]
+            coincidence_sumlist.append(coincidence_cnt)
+        coincidence_score.append(sum(coincidence_sumlist) / len(coincidence_sumlist))
+    print(coincidence_score)
+    key_length = max(coincidence_score)
+    return key_length
+
+
 if __name__ == '__main__':
-    key = "pera"
+
+
+    key = "coolio"
+
     # encoded = crypt("XWIGI EGI XLS XNTTW SU TRRVNTIMDR SCI XWEI LMAP TGIKICX CDYG HMHXTV JGSB GIPHXRV NSJV HXEGC ECH SCI XWEI LMAP TGIKICX CDYG VSKIGRBICX XWMH XW E ZTVN XQESGXPRI AIHWDR XD GIBIQIG TWEIRMPPAC JDV EIXPGZW YHMCK JGIFYTRRC ECEACHMH LLXGW GIFYXVT ASCKTV TPWHEVI SU IIMX MC DVSIG IS ERLXIKI FTXIIG GIHYAXH", key)
     encoded = crypt("hello hello", key)
     print(encoded)
     decoded = crypt(encoded, key, reverse=True)
     print(decoded)
+
+
+
+    # decrypt_key_length("pretty")
+    # decrypt_key_length(crypt("whatisitactuallythatitisinpeaspleasetellmeohprettypleaseiwouldliketoknowitverymuchsoyes", key))
+    decrypt_key_length(crypt("ineedareallylongmessagesoiamjustgonnakeeponwritingsomerandomstuffwhoevencarewhatitisicertainlydontsodonteventrytomakesenseofthisisweartogodwhatisitactuallythatitisinpeaspleasetellmeohprettypleaseiwouldliketoknowitverymuchsoyes", key))
+    # decrypt_key_length("VVHQWVVRMHUSGJG")
+
+    raise SystemExit
